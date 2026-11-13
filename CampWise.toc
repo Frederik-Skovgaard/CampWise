@@ -1,0 +1,27 @@
+## Interface: 16001
+## Title: CampWise
+## Notes: All-in-one camping helper for WoW: Forever. Camp buff timers, placement advice, one camp bar and tooltips.
+## Author: Frederik
+## Version: 2.0.1
+## SavedVariables: CampWiseDB, CampwiseDB
+## SavedVariablesPerCharacter: CampWiseCharDB, CampwiseCharDB
+## IconTexture: Interface\Icons\Spell_Fire_Fire
+## Category: Professions
+## X-License: MIT
+## X-Website: https://github.com/Frederik-Skovgaard/CampWise
+# Release upload IDs: replace each 000000 with your project ID and remove the leading "# " so the line starts with "## ".
+# ## X-Curse-Project-ID: 000000
+# ## X-Wago-ID: 000000
+
+Core.lua
+Modules\Style.lua
+Data\CampData.lua
+Modules\Auras.lua
+Modules\Timers.lua
+Modules\Bar.lua
+Modules\Tooltips.lua
+Modules\Camp.lua
+Modules\Advisor.lua
+Modules\Share.lua
+Modules\Pins.lua
+Modules\Options.lua

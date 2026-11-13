@@ -1,0 +1,11 @@
+package-as: CampWise
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - .github
+  - .gitignore
+  - .gitattributes
+  - .pkgmeta
