@@ -9,8 +9,8 @@
 ## Category: Professions
 ## X-License: MIT
 ## X-Website: https://github.com/Frederik-Skovgaard/CampWise
-# Release upload IDs: replace each 000000 with your project ID and remove the leading "# " so the line starts with "## ".
-# ## X-Curse-Project-ID: 000000
+## X-Curse-Project-ID: 1803222
+# Wago upload: replace 000000 with the Wago project ID and remove the leading "# ".
 # ## X-Wago-ID: 000000
 
 Core.lua
