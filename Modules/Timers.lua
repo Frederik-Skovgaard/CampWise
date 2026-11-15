@@ -33,6 +33,9 @@ end
 
 -- Scan the player's buffs once and store state[key] = aura copy.
 function Timers:Scan()
+    -- While auras are secret (combat) they can't be read at all. Keep the last snapshot: its
+    -- expiry times are absolute, so the countdowns keep running. Rescanned after combat.
+    if ns.Auras:Locked() then self:Refresh() return end
     local state = {}
     local keyBySpell, keyByName = {}, {}
     for key, aura in pairs(ns.Data.CampAuras) do
