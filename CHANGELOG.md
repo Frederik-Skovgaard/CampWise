@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.3 (2026-11-15)
+
+- Fixed a Lua error from camp sharing: "Share.lua:204: attempt to perform arithmetic on field 'lastSeen' (a string value)". Your own camp pin was saved with your realm name where its time should be, so the 10-second cleanup failed. Camp times are now always numbers, and a bad entry is dropped instead of causing an error
 ## 2.0.2 (2026-11-15)
 
 - Fixed a Lua error in combat: "GetAuraDataByIndex(): Auras cannot be accessed when secret while tainted by 'CampWise'". The client blocks addons from reading auras while they're secret, so CampWise now pauses aura reads in combat and keeps what it had: timers keep counting down, the camp bar and your shared camp stay as they were, and everything rescans when combat ends
