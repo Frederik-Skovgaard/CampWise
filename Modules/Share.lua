@@ -147,7 +147,9 @@ end
 -- Add or refresh a camp. Same map and within MERGE_YARDS = same camp.
 -- Your own camp is only ever changed by your own reports; others can't rewrite it.
 function Share:AddReport(camp, sender, now)
-    now = now or GetTime()
+    -- Only ever a GetTime() number. (UnitName returns name, realm; an unwrapped call once
+    -- passed the realm in here and broke Prune.)
+    if type(now) ~= "number" then now = GetTime() end
     if camp.own then
         -- Only one "Your camp": the previous fire stops being yours.
         for _, c in ipairs(self.camps) do c.own = nil end
@@ -201,7 +203,8 @@ function Share:Prune(now)
     now = now or GetTime()
     local removed = false
     for i = #self.camps, 1, -1 do
-        if now - self.camps[i].lastSeen > CAMP_TTL then
+        local seen = tonumber(self.camps[i].lastSeen)
+        if not seen or now - seen > CAMP_TTL then
             table.remove(self.camps, i)
             removed = true
         end
@@ -293,7 +296,7 @@ end
 
 function Share:AddOwnPin(camp)
     self:AddReport({ mapID = camp.mapID, x = camp.x, y = camp.y, violet = camp.violet,
-        objects = camp.objects or {}, own = true }, UnitName("player"))
+        objects = camp.objects or {}, own = true }, (UnitName("player")))
 end
 
 function Share:Broadcast(camp)
@@ -429,7 +432,7 @@ function Share:Print()
     for _, c in ipairs(camps) do
         local info = C_Map.GetMapInfo and C_Map.GetMapInfo(c.mapID)
         ns:Print(("  %s %.1f, %.1f by %s, %d min ago: %s%s"):format(info and info.name or c.mapID,
-            c.x * 100, c.y * 100, c.sender or "?", math.floor((GetTime() - c.lastSeen) / 60),
+            c.x * 100, c.y * 100, c.sender or "?", math.floor((GetTime() - (tonumber(c.lastSeen) or GetTime())) / 60),
             #c.objects > 0 and table.concat(c.objects, ", ") or "no objects known yet", c.violet and " (purple campfire)" or ""))
     end
 end
