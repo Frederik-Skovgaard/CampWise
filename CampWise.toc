@@ -2,7 +2,7 @@
 ## Title: CampWise
 ## Notes: All-in-one camping helper for WoW: Forever. Camp buff timers, placement advice, one camp bar and tooltips.
 ## Author: Frederik
-## Version: 2.0.1
+## Version: 2.0.2
 ## SavedVariables: CampWiseDB, CampwiseDB
 ## SavedVariablesPerCharacter: CampWiseCharDB, CampwiseCharDB
 ## IconTexture: Interface\Icons\Spell_Fire_Fire

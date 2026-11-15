@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.2 (2026-11-15)
+
+- Fixed a Lua error in combat: "GetAuraDataByIndex(): Auras cannot be accessed when secret while tainted by 'CampWise'". The client blocks addons from reading auras while they're secret, so CampWise now pauses aura reads in combat and keeps what it had: timers keep counting down, the camp bar and your shared camp stay as they were, and everything rescans when combat ends
 ## 2.0.1 (2026-11-13)
 
 Fixes from a code audit, mostly camp sharing privacy and safety.

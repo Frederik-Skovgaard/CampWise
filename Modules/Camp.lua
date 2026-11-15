@@ -10,18 +10,19 @@ local issecret = issecretvalue or function() return false end
 
 -- Find Camp Benefits and return the tooltip lines and the aura, or nil.
 local function campBenefitLines()
-    if not (C_TooltipInfo and C_UnitAuras) then return nil end
+    if not C_TooltipInfo then return nil end
     local benefitsID = ns.Data.CampAuras.CAMP_BENEFITS.spellID
     for i = 1, 255 do
-        local a = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
+        local a = ns.Auras:GetRawAuraByIndex("player", i, "HELPFUL")
         if not a then return nil end
         if not issecret(a.spellId) and a.spellId == benefitsID then
-            local data
+            local ok, data
             if C_TooltipInfo.GetUnitBuffByAuraInstanceID and a.auraInstanceID then
-                data = C_TooltipInfo.GetUnitBuffByAuraInstanceID("player", a.auraInstanceID)
+                ok, data = pcall(C_TooltipInfo.GetUnitBuffByAuraInstanceID, "player", a.auraInstanceID)
             elseif C_TooltipInfo.GetUnitAura then
-                data = C_TooltipInfo.GetUnitAura("player", i, "HELPFUL")
+                ok, data = pcall(C_TooltipInfo.GetUnitAura, "player", i, "HELPFUL")
             end
+            if not ok then data = nil end
             return data and data.lines, ns.Auras.Sanitize(a)
         end
     end
@@ -87,6 +88,9 @@ end
 -- self.here = the same list but only when that buff came from the fire you're at now,
 -- self.byProf[prof] = entry in self.here.
 function Camp:Scan()
+    -- Auras can't be read while they're secret (combat): keep what we had and rescan after.
+    if ns.Auras:Locked() then self.pending = true return end
+    self.pending = nil
     self:UpdateArrival()
     local placed, byProf = {}, {}
     local lines, aura = campBenefitLines()
@@ -226,6 +230,7 @@ end
 function Camp:OnEnable()
     ns:OnAuraChanged(function() Camp:Scan() end)
     ns:RegisterEvent("PLAYER_ENTERING_WORLD", function() Camp:Scan() end)
+    ns:RegisterEvent("PLAYER_REGEN_ENABLED", function() if Camp.pending then Camp:Scan() end end)
     if GameTooltip and GameTooltip.HookScript then
         GameTooltip:HookScript("OnShow", function(tt) Camp:OnTooltip(tt) end)
     end

@@ -18,23 +18,47 @@ local function sanitize(aura)
 end
 Auras.Sanitize = sanitize
 
--- Look up one of the player's buffs by spell ID.
+-- On Midnight-era clients, reading auras while they're secret (in combat, encounters) doesn't
+-- return secret values to addon code: the aura API raises "Auras cannot be accessed when secret
+-- while tainted". So every read checks Locked() first, and is pcall'd as a backstop.
+function Auras:Locked()
+    if C_Secrets and C_Secrets.ShouldAurasBeSecret then
+        local ok, secret = pcall(C_Secrets.ShouldAurasBeSecret)
+        if ok and secret then return true end
+    end
+    return InCombatLockdown and InCombatLockdown() or false
+end
+
+-- Raw aura by index, or nil, "locked" when auras can't be read right now.
+function Auras:GetRawAuraByIndex(unit, index, filter)
+    if not (C_UnitAuras and C_UnitAuras.GetAuraDataByIndex) or self:Locked() then return nil, "locked" end
+    local ok, raw = pcall(C_UnitAuras.GetAuraDataByIndex, unit, index, filter or "HELPFUL")
+    if not ok then return nil, "locked" end
+    return raw
+end
+
+-- Look up one of the player's buffs by spell ID. Returns nil, "locked" when auras are secret.
 function Auras:GetPlayerAura(spellID)
     if not (C_UnitAuras and C_UnitAuras.GetPlayerAuraBySpellID) then return nil end
-    return sanitize(C_UnitAuras.GetPlayerAuraBySpellID(spellID))
+    if self:Locked() then return nil, "locked" end
+    local ok, raw = pcall(C_UnitAuras.GetPlayerAuraBySpellID, spellID)
+    if not ok then return nil, "locked" end
+    return sanitize(raw)
 end
 
 -- Iterate a unit's helpful auras. callback(auraCopy) returns true to stop early.
--- Returns "secret" if any aura was hidden, so callers can show a fallback state.
+-- Returns "secret" if any aura was hidden, or "locked" if auras can't be read at all right
+-- now, so callers can keep their last state or show a fallback.
 function Auras:ForEachBuff(unit, callback, filter)
     local hidden
     for i = 1, 255 do
-        local raw = C_UnitAuras.GetAuraDataByIndex(unit, i, filter or "HELPFUL")
+        local raw, why = self:GetRawAuraByIndex(unit, i, filter)
+        if why then return why end
         if not raw then break end
-        local aura, why = sanitize(raw)
+        local aura, why2 = sanitize(raw)
         if aura then
             if callback(aura) then break end
-        elseif why then
+        elseif why2 then
             hidden = "secret"
         end
     end

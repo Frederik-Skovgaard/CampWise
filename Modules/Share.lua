@@ -321,6 +321,8 @@ end
 -- Your own camp: located where you sat down, kept while you're near the fire.
 -- Expects Camp:Scan to have run first (it runs before this on aura changes and in Tick).
 function Share:UpdateOwnCamp()
+    -- Camp auras can't be read while they're secret (combat); keep your camp as it was.
+    if ns.Auras:Locked() then return end
     local near = ns.Bar and ns.Bar:NearFire()
     if not near then self.own = nil return end
     -- Only Welcoming Campfire proves you're sitting right at the fire. Camp Benefits can be

@@ -306,8 +306,11 @@ function Bar:CreateFrame()
 end
 
 -- True while the player has the Campfire Nearby buff.
+-- While auras are secret (combat) the answer from before combat is kept.
 function Bar:NearFire()
-    return ns.Auras:GetPlayerAura(ns.Data.CampAuras.CAMPFIRE_NEARBY.spellID) ~= nil
+    if ns.Auras:Locked() then return self.lastNear or false end
+    self.lastNear = ns.Auras:GetPlayerAura(ns.Data.CampAuras.CAMPFIRE_NEARBY.spellID) ~= nil
+    return self.lastNear
 end
 
 -- Rebuild buttons. Secure attributes can't change in combat, so defer until combat ends.
