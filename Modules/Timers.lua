@@ -24,6 +24,22 @@ local function isWellFed(aura)
     return false
 end
 
+-- Camp Benefits is doubled (purple campfire) only once the buff itself is the 2-hour version.
+-- Violet Flames shows up as soon as you sit at a purple fire, while Camp Benefits can still be
+-- the normal 1-hour buff (from this fire or an earlier one), so Violet Flames alone isn't enough.
+-- A normal Camp Benefits lasts exactly 1 hour, so a longer duration means doubled. That also
+-- keeps "2x" after you walk away and Violet Flames drops. If the duration can't be read, fall
+-- back to needing both buffs at once.
+local DOUBLED_MIN_DURATION = 3600 + 60
+local function isDoubled(state)
+    local cb = state.CAMP_BENEFITS
+    if not cb then return false end
+    local dur = cb.duration
+    if type(dur) == "number" and dur > 0 then return dur >= DOUBLED_MIN_DURATION end
+    return state.VIOLET ~= nil
+end
+Timers.IsDoubled = isDoubled
+
 local function formatTime(sec)
     sec = math.floor(sec)
     if sec >= 3600 then return ("%dh %02dm"):format(math.floor(sec / 3600), math.floor((sec % 3600) / 60)) end
@@ -208,7 +224,8 @@ function Timers:Refresh()
             ns.db.timers.icons = ns.db.timers.icons or {}
             if a.icon and not issecretvalue_safe(a.icon) then ns.db.timers.icons[key] = a.icon end
             -- Purple campfire: Camp Benefits is doubled and lasts 2 hours.
-            if key == "CAMP_BENEFITS" and state.VIOLET then
+            local doubled = key == "CAMP_BENEFITS" and isDoubled(state)
+            if doubled then
                 row.label:SetText(row.def.label .. " (2x)")
                 row.label:SetTextColor(0.75, 0.5, 1)
             else
@@ -235,7 +252,7 @@ function Timers:Refresh()
                 row.bar:SetValue(1)
             end
             row.time:SetTextColor(r, g, b)
-            if key == "CAMP_BENEFITS" and state.VIOLET then r, g, b = 0.6, 0.35, 1 end
+            if doubled then r, g, b = 0.6, 0.35, 1 end
             row.bar:SetStatusBarColor(r, g, b, theme.barAlpha)
         else
             row.icon:SetTexture(self:MissingIcon(key))

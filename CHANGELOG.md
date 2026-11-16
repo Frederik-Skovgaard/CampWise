@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.5 (2026-11-16)
+
+- Fixed the timer box showing "Camp Benefits (2x)" before you actually had the doubled buff. Sitting at a purple campfire gives Violet Flames right away, but your Camp Benefits can still be the normal 1-hour one. CampWise now shows 2x only when Camp Benefits itself is the doubled version (lasting longer than 1 hour), and keeps showing it after you leave the fire
 ## 2.0.4 (2026-11-16)
 
 - Fixed clicking a player's name in chat: instead of starting a whisper, the chat box could show "Say: /cw Name". On clients where /cw is already a whisper command, CampWise's /cw alias took it over. CampWise now only adds /cw when nothing else uses it; otherwise use /campwise
