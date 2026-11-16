@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.4 (2026-11-16)
+
+- Fixed clicking a player's name in chat: instead of starting a whisper, the chat box could show "Say: /cw Name". On clients where /cw is already a whisper command, CampWise's /cw alias took it over. CampWise now only adds /cw when nothing else uses it; otherwise use /campwise
 ## 2.0.3 (2026-11-15)
 
 - Fixed a Lua error from camp sharing: "Share.lua:204: attempt to perform arithmetic on field 'lastSeen' (a string value)". Your own camp pin was saved with your realm name where its time should be, so the 10-second cleanup failed. Camp times are now always numbers, and a bad entry is dropped instead of causing an error

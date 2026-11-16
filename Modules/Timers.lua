@@ -302,6 +302,6 @@ function Timers:HandleCommand(arg)
         t.warnSeconds = math.max(0, tonumber(arg) * 60)
         ns:Print(("warning at %d min left"):format(t.warnSeconds / 60))
     else
-        ns:Print("/cw timers [show | hide | lock | reset | <minutes before warning>]")
+        ns:Print(ns:Slash("/cw timers [show | hide | lock | reset | <minutes before warning>]"))
     end
 end
