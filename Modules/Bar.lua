@@ -488,10 +488,10 @@ function Bar:HandleCommand(arg)
             b.scale = s
             self.frame:SetScale(s)
         else
-            ns:Print("/cw bar scale 0.5 - 2 (out of combat)")
+            ns:Print(ns:Slash("/cw bar scale 0.5 - 2 (out of combat)"))
         end
     else
-        ns:Print("/cw bar [show | hide | lock | reset | scale <n>]")
+        ns:Print(ns:Slash("/cw bar [show | hide | lock | reset | scale <n>]"))
     end
 end
 

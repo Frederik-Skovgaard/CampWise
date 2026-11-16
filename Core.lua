@@ -50,6 +50,11 @@ function ns:Print(...)
     print("|cffff9933CampWise|r:", ...)
 end
 
+-- Help text is written with /cw; show /campwise instead when the short alias wasn't registered.
+function ns:Slash(text)
+    return (text:gsub("/cw", self.slash or "/cw"))
+end
+
 -- Ctrl + left click on a box toggles its position lock.
 function ns:ToggleLock(box, label)
     local cfg = self.db[box]
@@ -174,9 +179,35 @@ ns:RegisterEvent("PLAYER_LOGIN", function()
     forEachModule("OnEnable")
 end)
 
--- Slash command: /campwise or /cw
+-- Slash command: /campwise, plus the short /cw alias only when nothing else already uses it.
+-- Blizzard's chat code maps every slash alias to its owner in one shared table
+-- (hash_ChatTypeInfoList), and an addon alias imported later overwrites a built-in one.
+-- Some clients use /cw for whispers (SLASH_WHISPER1); taking it there broke clicking a
+-- player's name in chat: the box showed "Say: /cw Name" instead of opening a whisper.
+local function slashTaken(alias)
+    alias = alias:upper()
+    if type(hash_ChatTypeInfoList) == "table" and hash_ChatTypeInfoList[alias] then return true end
+    if type(hash_SlashCmdList) == "table" and hash_SlashCmdList[alias] then return true end
+    local taken = false
+    pcall(function()
+        for k, v in pairs(_G) do
+            if type(k) == "string" and type(v) == "string" and k:sub(1, 6) == "SLASH_"
+                and k:sub(1, 14) ~= "SLASH_CAMPWISE" and v:upper() == alias then
+                taken = true
+                return
+            end
+        end
+    end)
+    return taken
+end
+
 SLASH_CAMPWISE1 = "/campwise"
-SLASH_CAMPWISE2 = "/cw"
+if slashTaken("/cw") then
+    ns.slash = "/campwise"
+else
+    SLASH_CAMPWISE2 = "/cw"
+    ns.slash = "/cw"
+end
 SlashCmdList.CAMPWISE = function(msg)
     local cmd = strtrim(msg or ""):lower()
     if cmd == "debug" then
@@ -212,6 +243,6 @@ SlashCmdList.CAMPWISE = function(msg)
     elseif cmd:match("^timers") then
         ns.Timers:HandleCommand(strtrim(cmd:sub(7)))
     else
-        ns:Print("commands: /cw config, /cw timers, /cw bar, /cw camps, /cw share, /cw next, /cw camp, /cw advisor, /cw tooltips, /cw auras, /cw debug, /cw version")
+        ns:Print(ns:Slash("commands: /cw config, /cw timers, /cw bar, /cw camps, /cw share, /cw next, /cw camp, /cw advisor, /cw tooltips, /cw auras, /cw debug, /cw version"))
     end
 end

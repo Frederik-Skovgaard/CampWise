@@ -26,7 +26,7 @@ All-in-one camping helper for **WoW: Forever**. One addon instead of five: camp 
 
 ## Slash commands
 
-`/cw` or `/campwise`:
+`/cw` or `/campwise` (only `/campwise` if your client already uses `/cw` for something else, such as whispers):
 
 - `config`: settings window
 - `timers`, `bar`: show or hide a box (`lock`, `reset`, `scale <n>`, `<minutes>` for the timer warning)
